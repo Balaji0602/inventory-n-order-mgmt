@@ -1,0 +1,15 @@
+# Ignore git and local environments
+.git/
+.gitignore
+.dockerignore
+docker-compose.yml
+README.md
+
+# Ignore all subfolder dockerignore targets recursively
+**/node_modules/
+**/dist/
+**/build/
+**/__pycache__/
+**/.venv/
+**/*.db
+**/.env
