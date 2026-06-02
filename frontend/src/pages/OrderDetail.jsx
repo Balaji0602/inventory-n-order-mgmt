@@ -21,7 +21,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  FormControl,
+  Select,
+  MenuItem
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,7 +32,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { useOrder, useDeleteOrder } from '../hooks/useOrders';
+import { useOrder, useDeleteOrder, useUpdateOrder } from '../hooks/useOrders';
 import { useNotification } from '../context/NotificationContext';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
@@ -41,6 +44,7 @@ const OrderDetail = () => {
   // Queries
   const { data: order, isLoading: isOrderLoading, error: orderError } = useOrder(id);
   const cancelMutation = useDeleteOrder();
+  const updateOrderMutation = useUpdateOrder(id);
 
   // Cancel modal trigger
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -186,11 +190,34 @@ const OrderDetail = () => {
                 <Typography variant="body2">{formatDate(order.order_date)}</Typography>
               </Box>
 
-              <Box>
-                <Typography variant="caption" color="textSecondary" sx={{ textTransform: 'uppercase', fontWeight: 600 }}>Order Status</Typography>
-                <Typography variant="body1" fontWeight="600" color={order.status === 'CANCELLED' ? 'error.main' : 'success.main'}>
-                  {order.status}
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="caption" color="textSecondary" sx={{ textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
+                  Update Order Status
                 </Typography>
+                <FormControl fullWidth size="small">
+                  <Select
+                    value={order.status}
+                    onChange={async (e) => {
+                      const newStatus = e.target.value;
+                      try {
+                        await updateOrderMutation.mutateAsync({ status: newStatus });
+                        showNotification(`Order status successfully updated to ${newStatus}.`, 'success');
+                      } catch (err) {
+                        showNotification(err.message || 'Failed to update order status.', 'error');
+                      }
+                    }}
+                    disabled={updateOrderMutation.isPending}
+                    sx={{
+                      fontWeight: 600,
+                      color: order.status === 'CANCELLED' ? 'error.main' : order.status === 'COMPLETED' ? 'success.main' : 'warning.main'
+                    }}
+                  >
+                    <MenuItem value="PENDING" style={{ fontWeight: 600, color: '#F59E0B' }}>PENDING</MenuItem>
+                    <MenuItem value="PROCESSING" style={{ fontWeight: 600, color: '#2563EB' }}>PROCESSING</MenuItem>
+                    <MenuItem value="COMPLETED" style={{ fontWeight: 600, color: '#16A34A' }}>COMPLETED</MenuItem>
+                    <MenuItem value="CANCELLED" style={{ fontWeight: 600, color: '#DC2626' }}>CANCELLED</MenuItem>
+                  </Select>
+                </FormControl>
               </Box>
             </Box>
           </Card>

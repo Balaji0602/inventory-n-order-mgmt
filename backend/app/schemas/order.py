@@ -24,3 +24,8 @@ class OrderResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class OrderUpdate(BaseModel):
+    status: str = Field(..., description="Target status update (PENDING, PROCESSING, COMPLETED, CANCELLED)")
+

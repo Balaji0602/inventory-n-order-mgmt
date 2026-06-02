@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import WarningIcon from '@mui/icons-material/Warning';
 import { useCustomers, useDeleteCustomer } from '../hooks/useCustomers';
@@ -196,13 +197,22 @@ const CustomerList = () => {
                     {formatDate(customer.created_at)}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      color="error"
-                      size="small"
-                      onClick={() => handleDeleteClick(customer.id, customer.email)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    <Box display="flex" justifyContent="center" gap={1}>
+                      <IconButton
+                        color="primary"
+                        size="small"
+                        onClick={() => navigate(`/customers/edit/${customer.id}`)}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => handleDeleteClick(customer.id, customer.email)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))

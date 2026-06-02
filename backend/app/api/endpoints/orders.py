@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.schemas.order import OrderCreate, OrderResponse
+from app.schemas.order import OrderCreate, OrderResponse, OrderUpdate
 from app.services.order import order_service
 
 router = APIRouter()
@@ -52,6 +52,12 @@ def list_orders(
 def get_order(id: UUID, db: Session = Depends(get_db)):
     """Fetch granular details of an order invoice including items."""
     return order_service.get_order(db, id=id)
+
+
+@router.put("/{id}", response_model=OrderResponse)
+def update_order(id: UUID, order_in: OrderUpdate, db: Session = Depends(get_db)):
+    """Update an order's status and sync inventory."""
+    return order_service.update_order(db, id=id, obj_in=order_in)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

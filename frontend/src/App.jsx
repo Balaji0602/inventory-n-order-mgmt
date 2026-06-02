@@ -16,6 +16,7 @@ import AddProduct from './pages/AddProduct';
 import EditProduct from './pages/EditProduct';
 import CustomerList from './pages/CustomerList';
 import AddCustomer from './pages/AddCustomer';
+import EditCustomer from './pages/EditCustomer';
 import OrderList from './pages/OrderList';
 import CreateOrder from './pages/CreateOrder';
 import OrderDetail from './pages/OrderDetail';
@@ -49,6 +50,7 @@ const App = () => {
                   <Route path="products/edit/:id" element={<EditProduct />} />
                   <Route path="customers" element={<CustomerList />} />
                   <Route path="customers/add" element={<AddCustomer />} />
+                  <Route path="customers/edit/:id" element={<EditCustomer />} />
                   <Route path="orders" element={<OrderList />} />
                   <Route path="orders/create" element={<CreateOrder />} />
                   <Route path="orders/details/:id" element={<OrderDetail />} />

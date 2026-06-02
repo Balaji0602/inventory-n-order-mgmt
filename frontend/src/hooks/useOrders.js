@@ -38,3 +38,15 @@ export const useDeleteOrder = () => {
     },
   });
 };
+
+export const useUpdateOrder = (id) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => api.put(`/orders/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', id] });
+      queryClient.invalidateQueries({ queryKey: ['products'] }); // stock might change!
+    },
+  });
+};

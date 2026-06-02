@@ -9,7 +9,7 @@ from app.models.order_item import OrderItem
 from app.repositories.order import order_repository
 from app.repositories.product import product_repository
 from app.services.customer import customer_service
-from app.schemas.order import OrderCreate
+from app.schemas.order import OrderCreate, OrderUpdate
 
 logger = logging.getLogger("app.services.order")
 
@@ -149,6 +149,51 @@ class OrderService:
         except Exception as e:
             db.rollback()
             logger.error(f"Transaction aborted during Order deletion (ID: {id}): {str(e)}")
+            raise e
+
+    def update_order(self, db: Session, id: UUID, *, obj_in: OrderUpdate) -> Order:
+        """
+        Updates an order's status and automatically synchronizes inventory stock 
+        levels if transitioning into or out of a CANCELLED state.
+        """
+        order = self.get_order(db, id)
+        old_status = order.status
+        new_status = obj_in.status.upper()
+        
+        if old_status == new_status:
+            return order
+            
+        try:
+            # 1. If transitioning TO Cancelled: restore inventory stock counts
+            if new_status == "CANCELLED" and old_status != "CANCELLED":
+                for item in order.items:
+                    product = product_repository.get_for_update(db, id=item.product_id)
+                    if product:
+                        product.stock_quantity += item.quantity
+                        db.add(product)
+                        
+            # 2. If transitioning FROM Cancelled: check stock and deduct counts
+            elif old_status == "CANCELLED" and new_status != "CANCELLED":
+                for item in order.items:
+                    product = product_repository.get_for_update(db, id=item.product_id)
+                    if not product:
+                        raise EntityNotFoundException(f"Product referenced in order item was not found.")
+                    if product.stock_quantity < item.quantity:
+                        raise InsufficientStockException(
+                            f"Stock for SKU '{product.sku}' is insufficient to reactivate this order."
+                        )
+                    product.stock_quantity -= item.quantity
+                    db.add(product)
+            
+            # 3. Save new status
+            order.status = new_status
+            db.add(order)
+            db.commit()
+            return self.get_order(db, order.id)
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Transaction aborted during Order status update (ID: {id}): {str(e)}")
             raise e
 
 

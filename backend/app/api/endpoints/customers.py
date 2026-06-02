@@ -54,6 +54,12 @@ def get_customer(id: UUID, db: Session = Depends(get_db)):
     return customer_service.get_customer(db, id=id)
 
 
+@router.put("/{id}", response_model=CustomerResponse)
+def update_customer(id: UUID, customer_in: CustomerUpdate, db: Session = Depends(get_db)):
+    """Update profile details of a customer."""
+    return customer_service.update_customer(db, id=id, obj_in=customer_in)
+
+
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_customer(id: UUID, db: Session = Depends(get_db)):
     """Remove a customer profile."""

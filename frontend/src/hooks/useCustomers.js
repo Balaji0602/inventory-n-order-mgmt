@@ -27,6 +27,17 @@ export const useCreateCustomer = () => {
   });
 };
 
+export const useUpdateCustomer = (id) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => api.put(`/customers/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customer', id] });
+    },
+  });
+};
+
 export const useDeleteCustomer = () => {
   const queryClient = useQueryClient();
   return useMutation({
