@@ -67,7 +67,8 @@ class BaseRepository(Generic[ModelType]):
     def create(self, db: Session, *, obj_in: Any) -> ModelType:
         db_obj = self.model(**obj_in)
         db.add(db_obj)
-        db.flush()  # Flushes changes to DB to generate UUIDs but doesn't commit transaction
+        db.commit()  # Persist changes to database
+        db.refresh(db_obj)  # Retrieve generated fields (ID, Timestamps)
         return db_obj
 
     def update(
@@ -88,12 +89,13 @@ class BaseRepository(Generic[ModelType]):
                 setattr(db_obj, field, update_data[field])
                 
         db.add(db_obj)
-        db.flush()
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
     def delete(self, db: Session, *, id: UUID) -> Optional[ModelType]:
-        obj = db.query(self.model).get(id)
+        obj = db.query(self.model).filter(self.model.id == id).first()
         if obj:
             db.delete(obj)
-            db.flush()
+            db.commit()
         return obj
