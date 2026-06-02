@@ -21,7 +21,7 @@ def list_products(
     limit: int = Query(10, ge=1, le=100, description="Items limit per page"),
     search: Optional[str] = Query(None, description="Fuzzy search matching SKU or Name"),
     sort_by: Optional[str] = Query("created_at", description="Field target sorting catalog"),
-    sort_dir: str = Query("desc", regex="^(asc|desc)$", description="Sorting direction directive"),
+    sort_dir: str = Query("desc", pattern="^(asc|desc)$", description="Sorting direction directive"),
     db: Session = Depends(get_db)
 ):
     """Retrieve filtered, sorted, and paginated product items."""
