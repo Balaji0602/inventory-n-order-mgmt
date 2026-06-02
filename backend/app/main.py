@@ -8,6 +8,9 @@ from app.exceptions.handlers import register_exception_handlers
 from app.middleware.logging import LoggingMiddleware
 from app.middleware.validation import ValidationMiddleware
 
+from app.core.database import engine
+from app.db.base import Base
+
 # 1. Initialize structured system logging
 setup_logging()
 logger = logging.getLogger("app.main")
@@ -47,3 +50,12 @@ def startup_event():
         f"Booting system settings: Environment={settings.ENV} | Debug={settings.DEBUG}",
         extra={"env": settings.ENV}
     )
+    
+    # Automatically generate database tables if they do not exist
+    logger.info("Initializing database schema tables...")
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database schema tables successfully verified and initialized.")
+    except Exception as e:
+        logger.error(f"Error during database tables initialization: {str(e)}")
+

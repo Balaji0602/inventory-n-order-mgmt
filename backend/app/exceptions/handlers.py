@@ -41,7 +41,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content={
-                "success": false,
+                "success": False,
                 "error": {
                     "code": "VALIDATION_ERROR",
                     "message": "Input validation failed.",
@@ -60,7 +60,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=500,
             content={
-                "success": false,
+                "success": False,
                 "error": {
                     "code": "INTERNAL_SERVER_ERROR",
                     "message": "An unexpected error occurred. Please contact support.",
