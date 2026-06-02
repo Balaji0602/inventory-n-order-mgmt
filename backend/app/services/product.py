@@ -61,16 +61,6 @@ class ProductService:
 
     def delete_product(self, db: Session, id: UUID) -> Product:
         product = self.get_product(db, id)
-        
-        # Verify if referenced by any orders
-        order_item_reference = db.query(OrderItem).filter(OrderItem.product_id == id).first()
-        if order_item_reference:
-            raise AppException(
-                code="CONSTRAINT_VIOLATION",
-                message=f"Product with SKU '{product.sku}' cannot be deleted because it is linked to existing transactions.",
-                status_code=400
-            )
-            
         product_repository.delete(db, id=id)
         return product
 

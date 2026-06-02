@@ -61,16 +61,6 @@ class CustomerService:
 
     def delete_customer(self, db: Session, id: UUID) -> Customer:
         customer = self.get_customer(db, id)
-        
-        # Verify if referenced by any orders
-        order_reference = db.query(Order).filter(Order.customer_id == id).first()
-        if order_reference:
-            raise AppException(
-                code="CONSTRAINT_VIOLATION",
-                message=f"Customer '{customer.email}' cannot be deleted because they have existing order records.",
-                status_code=400
-            )
-            
         customer_repository.delete(db, id=id)
         return customer
 

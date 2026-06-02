@@ -34,6 +34,10 @@ class BaseRepository(Generic[ModelType]):
         """
         query = db.query(self.model)
 
+        # Filter by active records only if is_active column exists
+        if hasattr(self.model, "is_active"):
+            query = query.filter(self.model.is_active == True)
+
         # 1. Apply search filters (fuzzy matching)
         if search and search_fields:
             search_filters = []
@@ -96,6 +100,10 @@ class BaseRepository(Generic[ModelType]):
     def delete(self, db: Session, *, id: UUID) -> Optional[ModelType]:
         obj = db.query(self.model).filter(self.model.id == id).first()
         if obj:
-            db.delete(obj)
+            if hasattr(obj, "is_active"):
+                obj.is_active = False
+                db.add(obj)
+            else:
+                db.delete(obj)
             db.commit()
         return obj

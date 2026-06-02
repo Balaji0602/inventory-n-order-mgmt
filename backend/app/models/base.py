@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Boolean, Column, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declared_attr
 from app.core.database import Base
@@ -13,6 +13,13 @@ class TimeStampedModel(Base):
         primary_key=True,
         default=uuid.uuid4,
         index=True
+    )
+    
+    is_active = Column(
+        Boolean,
+        server_default="true",
+        default=True,
+        nullable=False
     )
     
     created_at = Column(
