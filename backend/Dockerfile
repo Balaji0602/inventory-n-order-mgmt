@@ -1,5 +1,5 @@
 # Stage 1: Build dependencies in temporary image
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 
 # Stage 2: Final minimal production runtime image
-FROM python:3.12-slim as runner
+FROM python:3.12-slim AS runner
 
 WORKDIR /app
 
